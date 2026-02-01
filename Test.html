@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Will you be my Valentine? 💕</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #ffc0cb, #ffb6c1, #ffd1dc);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        .container {
+            background: white;
+            border-radius: 30px;
+            padding: 60px 80px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            max-width: 600px;
+            position: relative;
+        }
+
+        .cat {
+            font-size: 100px;
+            margin-bottom: 20px;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+
+        h1 {
+            font-size: 36px;
+            color: #333;
+            margin-bottom: 40px;
+            font-weight: 600;
+        }
+
+        .buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            align-items: center;
+            margin-top: 30px;
+            position: relative;
+            min-height: 120px;
+            width: 100%;
+        }
+
+        .btn {
+            padding: 15px 40px;
+            border: none;
+            border-radius: 50px;
+            font-size: 20px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        #yesBtn {
+            background: linear-gradient(135deg, #ff6b9d, #c86b98);
+            color: white;
+            position: relative;
+            z-index: 10;
+        }
+
+        #yesBtn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 25px rgba(255, 107, 157, 0.4);
+        }
+
+        #noBtn {
+            background: #e0e0e0;
+            color: #666;
+            position: absolute;
+            right: 80px;
+        }
+
+        #noBtn:hover {
+            background: #d0d0d0;
+        }
+
+        .note {
+            margin-top: 20px;
+            color: #666;
+            font-size: 14px;
+            font-style: italic;
+        }
+
+        .success-screen {
+            display: none;
+            text-align: center;
+        }
+
+        .success-screen h2 {
+            font-size: 48px;
+            color: #ff6b9d;
+            margin-bottom: 20px;
+            animation: bounce 1s ease;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-30px); }
+        }
+
+        .success-screen p {
+            font-size: 24px;
+            color: #333;
+            margin-top: 20px;
+        }
+
+        .heart {
+            font-size: 80px;
+            animation: heartbeat 1.5s ease infinite;
+        }
+
+        @keyframes heartbeat {
+            0%, 100% { transform: scale(1); }
+            25% { transform: scale(1.2); }
+            50% { transform: scale(1); }
+        }
+
+        canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 9999;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="confetti"></canvas>
+    
+    <div class="container">
+        <div id="questionScreen">
+            <div class="cat">🐱💕</div>
+            <h1>sakshi will you be my valentine?</h1>
+            
+            <div class="buttons">
+                <button id="yesBtn" class="btn">Yes</button>
+                <button id="noBtn" class="btn">No</button>
+            </div>
+            
+            <p class="note">*"No" seems a bit shy 😈</p>
+        </div>
+
+        <div id="successScreen" class="success-screen">
+            <div class="heart">❤️</div>
+            <h2>Yay! 🎉</h2>
+            <p>ily babe :)</p>
+            <div style="font-size: 60px; margin-top: 30px;">🥳✨💖</div>
+        </div>
+    </div>
+
+    <script>
+        const yesBtn = document.getElementById('yesBtn');
+        const noBtn = document.getElementById('noBtn');
+        const questionScreen = document.getElementById('questionScreen');
+        const successScreen = document.getElementById('successScreen');
+        const canvas = document.getElementById('confetti');
+        const ctx = canvas.getContext('2d');
+        
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        let yesClickCount = 0;
+        let noBtnOriginalSize = 20;
+
+        // Yes button click handler
+        yesBtn.addEventListener('click', () => {
+            questionScreen.style.display = 'none';
+            successScreen.style.display = 'block';
+            launchConfetti();
+        });
+
+        // No button hover handler - makes it run away
+        noBtn.addEventListener('mouseover', (e) => {
+            const container = document.querySelector('.container');
+            const containerRect = container.getBoundingClientRect();
+            const buttonsDiv = document.querySelector('.buttons');
+            
+            const maxX = buttonsDiv.offsetWidth - noBtn.offsetWidth - 20;
+            const maxY = 80;
+            
+            const randomX = Math.random() * maxX - 40;
+            const randomY = Math.random() * maxY - 40;
+            
+            noBtn.style.left = randomX + 'px';
+            noBtn.style.top = randomY + 'px';
+            
+            // Make Yes button bigger each time No is avoided
+            yesClickCount++;
+            const newSize = 20 + (yesClickCount * 2);
+            yesBtn.style.fontSize = newSize + 'px';
+            yesBtn.style.padding = (15 + yesClickCount * 2) + 'px ' + (40 + yesClickCount * 5) + 'px';
+        });
+
+        // Confetti animation
+        function launchConfetti() {
+            const confettiCount = 150;
+            const confetti = [];
+            
+            const colors = ['#ff6b9d', '#ffd93d', '#6bcf7f', '#4d9fff', '#b084ff', '#ff6b6b'];
+            
+            for (let i = 0; i < confettiCount; i++) {
+                confetti.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height - canvas.height,
+                    r: Math.random() * 6 + 4,
+                    d: Math.random() * confettiCount,
+                    color: colors[Math.floor(Math.random() * colors.length)],
+                    tilt: Math.random() * 10 - 10,
+                    tiltAngle: 0,
+                    tiltAngleIncremental: Math.random() * 0.07 + 0.05
+                });
+            }
+
+            function drawConfetti() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                confetti.forEach((c, index) => {
+                    ctx.beginPath();
+                    ctx.lineWidth = c.r / 2;
+                    ctx.strokeStyle = c.color;
+                    ctx.moveTo(c.x + c.tilt + c.r / 4, c.y);
+                    ctx.lineTo(c.x + c.tilt, c.y + c.tilt + c.r / 4);
+                    ctx.stroke();
+
+                    c.tiltAngle += c.tiltAngleIncremental;
+                    c.y += (Math.cos(c.d) + 3 + c.r / 2) / 2;
+                    c.x += Math.sin(c.d);
+                    c.tilt = Math.sin(c.tiltAngle - index / 3) * 15;
+
+                    if (c.y > canvas.height) {
+                        confetti[index] = {
+                            x: Math.random() * canvas.width,
+                            y: -20,
+                            r: c.r,
+                            d: c.d,
+                            color: c.color,
+                            tilt: c.tilt,
+                            tiltAngle: c.tiltAngle,
+                            tiltAngleIncremental: c.tiltAngleIncremental
+                        };
+                    }
+                });
+
+                requestAnimationFrame(drawConfetti);
+            }
+
+            drawConfetti();
+        }
+
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+    </script>
+</body>
+</html>
